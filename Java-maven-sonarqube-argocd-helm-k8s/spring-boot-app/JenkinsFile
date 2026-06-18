@@ -7,7 +7,114 @@ pipeline {
     }
 
     stages {
+pipeline {
+    agent any
 
+    environment {
+        SONAR_HOST_URL = 'http://54.224.120.104:9000'
+        IMAGE_NAME = "ritik2909/ultimate-cicd"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        DOCKER_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
+    }
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/RB5437/Ultimate-CI-CD-Pipeline-Jenkins-End-to-End-Project.git'
+
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                dir('Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app') {
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                dir('Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app') {
+
+                    withCredentials([
+                        string(
+                            credentialsId: 'sonarqube',
+                            variable: 'SONAR_TOKEN'
+                        )
+                    ]) {
+
+                        sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=spring-boot-demo \
+                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app') {
+
+                    sh """
+                    docker build -t ${DOCKER_IMAGE} .
+                    docker tag ${DOCKER_IMAGE} ${IMAGE_NAME}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Docker Login & Push') {
+            steps {
+
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'docker-cred',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+
+                    sh '''
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+
+                    docker push '${IMAGE_NAME}:${IMAGE_TAG}'
+                    docker push '${IMAGE_NAME}:latest'
+
+                    docker logout
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+
+        success {
+            echo 'Pipeline executed successfully'
+        }
+
+        failure {
+            echo 'Pipeline failed'
+        }
+
+        always {
+            cleanWs()
+        }
+    }
+}
         stage('Checkout') {
             steps {
                 checkout scm
