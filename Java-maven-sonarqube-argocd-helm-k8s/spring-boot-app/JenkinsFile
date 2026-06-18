@@ -18,7 +18,7 @@ pipeline {
     stage('Build and Test') {
       steps {
         sh '''
-        cd java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
+        cd Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
         mvn clean package
         '''
       }
@@ -33,7 +33,7 @@ pipeline {
         withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
 
           sh '''
-          cd java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
+          cd Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
           mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=$SONAR_URL
           '''
         }
@@ -50,7 +50,7 @@ pipeline {
         script {
 
           sh """
-          cd java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
+          cd Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
           docker build -t ${DOCKER_IMAGE} .
           """
 
@@ -77,9 +77,9 @@ pipeline {
           git config user.email "ritikbawane5437@gmail.com"
           git config user.name "ritik bawane"
 
-          sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonarqube-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+          sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
 
-          git add java-maven-sonarqube-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
+          git add Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
 
           git commit -m "Update deployment image to version ${BUILD_NUMBER}" || true
 
