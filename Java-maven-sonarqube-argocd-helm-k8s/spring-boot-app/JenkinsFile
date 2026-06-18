@@ -5,9 +5,7 @@ pipeline {
             args '--user root -v /var/run/docker.sock:/var/run/docker.sock --entrypoint=""'
         }
     }
-
     stages {
-
         stage('Checkout') {
             steps {
                 checkout scm
@@ -15,7 +13,6 @@ pipeline {
                 sh 'ls -ltr'
             }
         }
-
         stage('Build and Test') {
             steps {
                 sh '''
@@ -24,7 +21,6 @@ pipeline {
                 '''
             }
         }
-
         stage('Static Code Analysis') {
             environment {
                 SONAR_URL = "http://54.224.120.104:9000/"
@@ -35,19 +31,17 @@ pipeline {
                     apt-get update -qq && apt-get install -y -qq openjdk-17-jdk
                     export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
                     export PATH=$JAVA_HOME/bin:$PATH
-                    java -version
-
                     cd Java-maven-sonarqube-argocd-helm-k8s/spring-boot-app
                     mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=$SONAR_URL
                     '''
                 }
             }
         }
-
         stage('Build and Push Docker Image') {
             environment {
                 DOCKER_IMAGE = "ritik2909/ultimate-cicd:${BUILD_NUMBER}"
                 REGISTRY_CREDENTIALS = credentials('docker-cred')
+                DOCKER_API_VERSION = "1.44"
             }
             steps {
                 script {
@@ -62,7 +56,6 @@ pipeline {
                 }
             }
         }
-
         stage('Update Deployment File') {
             environment {
                 GIT_REPO_NAME = "Ultimate-CI-CD-Pipeline-Jenkins-End-to-End-Project"
@@ -82,7 +75,6 @@ pipeline {
             }
         }
     }
-
     post {
         always {
             cleanWs()
