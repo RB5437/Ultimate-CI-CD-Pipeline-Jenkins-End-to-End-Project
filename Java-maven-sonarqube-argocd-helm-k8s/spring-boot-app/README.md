@@ -59,9 +59,9 @@ Hardware Recommendations:
    2 CPU cores
 Complete Corrected SonarQube Installation (EC2 Ubuntu)
 bash
-# 1. System update + Java 17 install (SonarQube 26.x requires Java 17 or 21)
+# 1. System update + Java 21 install (SonarQube 26.x requires Java 17 or 21)
 sudo apt update
-sudo apt install -y unzip openjdk-17-jdk wget
+sudo apt install -y unzip openjdk-21-jdk wget
 
 # 2. Linux kernel settings — SonarQube runs Elasticsearch internally,
 #    if these values aren't set, SonarQube will crash immediately on startup
