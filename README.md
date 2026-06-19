@@ -23,7 +23,7 @@ Install Java
 
 ```
 sudo apt update
-sudo apt install fontconfig openjdk-17-jre
+sudo apt install fontconfig openjdk-21-jre
 ```
 
 Verify Java is Installed
@@ -40,8 +40,8 @@ sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
 echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
   https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
   /etc/apt/sources.list.d/jenkins.list > /dev/null
-sudo apt-get update
-sudo apt-get install jenkins
+sudo apt update
+sudo apt install jenkins
 ```
 
 **Note: ** By default, Jenkins will not be accessible to the external world due to the inbound traffic restriction by AWS. Open port 8080 in the inbound traffic rules as show below.
