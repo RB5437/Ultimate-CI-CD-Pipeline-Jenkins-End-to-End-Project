@@ -112,6 +112,7 @@ sudo apt install docker.io
 sudo su - 
 usermod -aG docker jenkins
 usermod -aG docker ubuntu
+newgrp docker
 systemctl restart docker
 ```
 
